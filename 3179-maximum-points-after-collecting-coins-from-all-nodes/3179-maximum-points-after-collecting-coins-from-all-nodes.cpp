@@ -1,36 +1,42 @@
 class Solution {
-public:
-    #define ll long long   
-    ll dp[100005][17];
-    ll dfs(int node,int par,int f,int k,vector<int> adj[],vector<int> &coins){
+private:
+    int t[100001][14];
 
-        
-        if(dp[node][f] != -1){
-            return dp[node][f];
+    int dfs(int i, int parent, int k, int power, const vector<int> &coins, unordered_map<int, vector<int>>& adj) {
+        if (power >= 14) 
+            return 0;
+
+        if(t[i][power] != -1) {
+            return t[i][power];
         }
-        
-       
-        if(f>15) f=15;
-        ll cur = (coins[node]>>(f+1));
-         ll res= (coins[node]>>f)-k;
-        
-        for(auto child:adj[node]){
-            if(child != par){
-                cur+=dfs(child,node,f+1,k,adj,coins);
-                res+=dfs(child,node,f,k,adj,coins);
+
+        int case1 = (coins[i] >> power) - k;
+        int case2 = coins[i] >> (power + 1);
+
+        for (int j : adj[i]) {
+            if (j != parent) {
+                case1 += dfs(j, i, k, power, coins, adj);
+                case2 += dfs(j, i, k, power + 1, coins, adj);
             }
         }
-        return dp[node][f] = max(cur,res); 
+
+        int result = max(case1, case2);
+        return t[i][power] = result;
     }
-    
+
+public:
     int maximumPoints(vector<vector<int>>& edges, vector<int>& coins, int k) {
-        int n=coins.size();
-        memset(dp,-1,sizeof(dp));
-        vector<int> adj[n];
-        for(auto &e:edges){
-            adj[e[0]].push_back(e[1]);
-            adj[e[1]].push_back(e[0]);
+        int n = coins.size();
+        memset(t, -1, sizeof(t));
+        unordered_map<int, vector<int>> adj(n);
+        for (vector<int>& edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+
+            adj[u].push_back(v);
+            adj[v].push_back(u);
         }
-        return dfs(0,-1,0,k,adj,coins);
+
+        return dfs(0, -1, k, 0, coins, adj);
     }
 };
