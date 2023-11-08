@@ -5,6 +5,11 @@ public:
         int ydiff=abs(sy-fy);
         
         if(xdiff ==0 && ydiff==0 && t==1)return false;
-        return (min(xdiff,ydiff) + abs(xdiff-ydiff))<=t;
+        if(xdiff==0 && ydiff==0 && t==1)return false;
+
+        int min_t=max(xdiff,ydiff);
+        if(t<min_t)return false;
+
+        return true;
     }
 };
