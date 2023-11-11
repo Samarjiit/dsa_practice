@@ -1,37 +1,49 @@
 class Graph {
 public:
-vector<vector<pair<int,int>>>adj; //adjacency list creation using matrix
+    unordered_map<int ,vector<pair<int,int>>>adj;
+    int N;
+    vector<int>result;
+    priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
     Graph(int n, vector<vector<int>>& edges) {
-            adj.resize(n);
-            for(auto e:edges){
-                adj[e[0]].push_back({e[1],e[2]});   //e[0] is the source node 
-            }
+           N=n;
+           for(auto &edge:edges){
+               int u=edge[0];
+               int v=edge[1];
+               int cost=edge[2];
+
+               adj[u].push_back({v,cost});
+           }
     }
     
     void addEdge(vector<int> edge) {
-        adj[edge[0]].push_back({edge[1],edge[2]});
+    int u=edge[0];
+    int v=edge[1];
+    int cost=edge[2];
+
+    adj[u].push_back({v,cost});
     }
     
     int shortestPath(int node1, int node2) {
-        priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
-        pq.push({0,node1});//pushing cost and src node
-
-        vector<int>cost(adj.size(),INT_MAX); //storing all the cost of each node;
-        cost[node1]=0;
+        vector<int>result(N,INT_MAX); //dist from src to all nodes. initialize with infinity
+        result[node1]=0;//dist from src to src =0
+        pq.push({0,node1});
 
         while(!pq.empty()){
-            auto currCost=pq.top().first,currNode=pq.top().second;
+            int d=pq.top().first; //pair
+            int node=pq.top().second;
             pq.pop();
 
-
-            for(auto neighbour:adj[currNode]){
-                if(cost[neighbour.first]>cost[currNode]+neighbour.second){ //neighbour.first =node 2(Destination)
-                    cost[neighbour.first]=cost[currNode]+neighbour.second;
-                    pq.push({cost[neighbour.first],neighbour.first});
-                }
+            for(auto &vec:adj[node]){
+                    int adjnode=vec.first;
+                    int dist=vec.second;
+                    if(d+dist<result[adjnode]){
+                        result[adjnode]=d+dist;
+                        pq.push({d+dist,adjnode});
+                    }
             }
         }
-        return cost[node2]==INT_MAX?-1:cost[node2];
+
+        return result[node2]==INT_MAX?-1:result[node2];
     }
 };
 
