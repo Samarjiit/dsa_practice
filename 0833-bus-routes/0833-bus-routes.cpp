@@ -1,42 +1,55 @@
+//Approach- (Using BFS)
+//T.C : O(m^2 * k) - m is the size of routes, and k is the maximum size of routes[i].
 class Solution {
 public:
     int numBusesToDestination(vector<vector<int>>& routes, int source, int target) {
-        unordered_map<int,vector<int>>bstoptoid;
+        if (source == target) {
+            return 0;
+        }
 
-        for(int i=0;i<routes.size();i++){
-            int bid=i;
-            vector<int>bstops=routes[i];
-            for(auto bstop:bstops){
-                bstoptoid[bstop].push_back(bid);
+        unordered_map<int, vector<int>> adj;
+        
+        for (int route = 0; route < routes.size(); route++) {
+            for (auto stop : routes[route]) {
+                adj[stop].push_back(route);
             }
         }
 
-        queue<pair<int,int>>q;//currstop bustravel
-        unordered_map<int,bool>bvis,btstopvis;
-        q.push({source,0});
-        btstopvis[source]=true;
+        queue<int> que;
+        vector<bool> visited(501, false);
+        
+        for (auto route : adj[source]){
+            que.push(route);
+            visited[route] = true;
+        }
 
-        while(!q.empty()){
-            int sz=q.size();
-            while(sz--){
-                pair<int,int>p=q.front();
-                q.pop();
-                int curstop=p.first;
-                int bustravel=p.second;
+        int busCount = 1;
+        while (!que.empty()) {
+            int size = que.size();
 
-                if(curstop==target)return bustravel;
+            while(size--) {
+                int route = que.front();
+                que.pop();
 
-                for(auto bus:bstoptoid[curstop]){
-                    if(bvis[bus])continue;
-                    bvis[bus]=true;
-                    for(auto bustop:routes[bus]){
-                        if(btstopvis[bustop])continue;
-                        btstopvis[bustop]=true;
-                        q.push({bustop,bustravel+1});
+                
+                for (auto &stop: routes[route]) {
+                    
+                    if (stop == target) {
+                        return busCount;
+                    }
+
+                    
+                    for (auto nextRoute : adj[stop]) {
+                        if (!visited[nextRoute]) {
+                            visited[nextRoute] = true;
+                            que.push(nextRoute);
+                        }
                     }
                 }
             }
+            busCount++;
         }
-            return -1;
+        return -1;
     }
 };
+
