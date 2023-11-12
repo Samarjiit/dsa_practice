@@ -1,6 +1,6 @@
 class Solution {
 public:
-   long long dp[51][51];
+   long long dp[50][51];
     long long solve(int i,int n,int limit){
         if(i==3){
             if(n==0)return 1;
